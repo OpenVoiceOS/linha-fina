@@ -81,3 +81,20 @@ for s in ["hello earth",
     # make color green
     # IntentMatch(name='change_color', slots={'color': 'green'}, conf=0.9142364945872282)
 ```
+
+---
+
+## Credits
+
+Originally an experimental research project by
+[**TigreGóticoLda**](https://tigregotico.pt), polished and donated to
+[OpenVoiceOS](https://openvoiceos.org). Its modernization, integration into
+OpenVoiceOS, and intent benchmarking were funded by the NGI0 Commons Fund.
+
+[![NGI0 Commons Fund](./ngi.png)](https://nlnet.nl/project/OpenVoiceOS)
+
+This project was funded through the [NGI0 Commons Fund](https://nlnet.nl/commonsfund),
+a fund established by [NLnet](https://nlnet.nl) with financial support from the
+European Commission's [Next Generation Internet](https://ngi.eu) programme, under
+the aegis of [DG Communications Networks, Content and Technology](https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/communications-networks-content-and-technology_en)
+under grant agreement No [101135429](https://cordis.europa.eu/project/id/101135429).
