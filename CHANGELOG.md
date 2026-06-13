@@ -1,12 +1,20 @@
 # Changelog
 
-## [0.2.0a1](https://github.com/TigreGotico/linha-fina/tree/0.2.0a1) (2026-05-23)
+## [0.2.0a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.2.0a2) (2026-06-13)
 
-[Full Changelog](https://github.com/TigreGotico/linha-fina/compare/0.1.0...0.2.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a1...0.2.0a2)
 
 **Merged pull requests:**
 
-- feat: migrate to ovos-spec-tools [\#13](https://github.com/TigreGotico/linha-fina/pull/13) ([JarbasAl](https://github.com/JarbasAl))
+- docs: standardize NGI0 Commons Fund attribution [\#15](https://github.com/OpenVoiceOS/linha-fina/pull/15) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.2.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.2.0a1) (2026-05-23)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.1.0...0.2.0a1)
+
+**Merged pull requests:**
+
+- feat: migrate to ovos-spec-tools [\#13](https://github.com/OpenVoiceOS/linha-fina/pull/13) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
