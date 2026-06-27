@@ -15,12 +15,16 @@ dependencies = [
     "joblib",
     "simplematch",
     "rapidfuzz",
-    "ovos-plugin-manager",
-    "ovos-bus-client",
+    # opm.pipeline entrypoints + the bus-client 2.x stack need modern
+    # opm/workshop; bare floors backtrack to ancient releases that still
+    # import mycroft_bus_client and break collection.
+    "ovos-plugin-manager>=2.3.0a1,<3.0.0",
+    "ovos-bus-client>=2.5.1a1,<3.0.0",
     "ovos-config",
     "ovos-utils",
     "langcodes",
-    "ovos-spec-tools",
+    # INTENT-4 SpecMessage registration topics (§6 template) live here
+    "ovos-spec-tools>=0.17.3a1",
 ]
 
 [project.optional-dependencies]
