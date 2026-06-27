@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.3.0a1) (2026-06-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a2...0.3.0a1)
+
+**Merged pull requests:**
+
+- feat: adopt INTENT-4 spec registration topics \(§6 template\) + dual-namespace e2e [\#17](https://github.com/OpenVoiceOS/linha-fina/pull/17) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.2.0a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.2.0a2) (2026-06-13)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a1...0.2.0a2)
