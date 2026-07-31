@@ -40,13 +40,13 @@ IntentEngine(instant_train=True)    # train after every register_*
 | `True` (eager) | REPL / notebook exploration where you want each registration to be immediately predictable. Costly in production. |
 
 In the OPM pipeline, `mycroft.ready` triggers a single `train()` per
-language; if your bus doesn't emit that event the first user utterance pays
-the training cost.
+language. If your bus does not emit that event, the first user utterance
+pays the training cost.
 
 ## Keyword backend
 
 ```python
-KeywordFeatures(use_automatons=False)   # default — regex per entity
+KeywordFeatures(use_automatons=False)   # default: regex per entity
 KeywordFeatures(use_automatons=True)    # Aho-Corasick (needs pyahocorasick)
 ```
 
@@ -56,12 +56,12 @@ automaton builds once and matches all patterns in a single pass.
 
 Other knobs on `KeywordFeatures`:
 
-- `ignore_list=[...]` — values to skip. Combined with entities whose name
-  contains `_name` (e.g. `first_name`, `place_name`), this lets you ignore
-  common-word collisions like "Mark" matching the verb "mark".
+- `ignore_list=[...]`: values to skip. Combined with entities whose name
+  contains `_name` (for example `first_name`, `place_name`), this lets you
+  ignore common-word collisions like "Mark" matching the verb "mark".
 - Hard-coded **minimum match length = 3 chars** (in `keywords.py`). Shorter
-  keywords are silently skipped; if you need 2-char codes (e.g. country
-  codes) you'll need to fork.
+  keywords are silently skipped. If you need 2-char codes (for example
+  country codes), you need to fork.
 
 ## Boost / penalty weights
 
@@ -90,7 +90,7 @@ negative mining" pattern.
 If you have intents with very few positives (≤3), this can leave the
 classifier with too few negatives to learn from. Mitigations:
 
-- Add more positive samples — even paraphrased variants help.
+- Add more positive samples. Even paraphrased variants help.
 - Reduce cross-skill interference by registering only the intents you need
   at a given time (the OPM pipeline supports `detach_intent` /
   `detach_skill` at runtime).
@@ -112,34 +112,37 @@ If you pass a model without `predict_proba` (a bare `SVC` without
 `probability=True`, for instance), the classifier wraps it in
 `CalibratedClassifierCV` so probabilistic output is still available.
 
-There is **no Bayesian hyperparameter tuning** — the engine uses sklearn
-defaults. For a benchmarking baseline this is intentional; if you want to
-sweep `C`, kernel, layer sizes, etc., do it externally and inject the
+There is **no Bayesian hyperparameter tuning**. The engine uses sklearn
+defaults. For a benchmarking baseline this is intentional. If you want to
+sweep `C`, kernel, layer sizes, and so on, do it externally and inject the
 tuned model via `init_model`.
 
 ## Utterance length cap
 
 `opm.py` skips utterances longer than `max_words=50`. The engine is
-bag-of-words; long inputs accumulate too many spurious token matches to
+bag-of-words. Long inputs accumulate too many spurious token matches to
 score reliably. The cap is hard-coded.
 
 ## LRU cache size
 
 `_calc_lf_intent` is wrapped in `functools.lru_cache(maxsize=3)`. The cache
 exists because OVOS calls the same utterance through `match_high`,
-`match_medium`, `match_low` in sequence — a size of 3 is enough to absorb
-one utterance across all three tiers. Raise it only if you have evidence of
-repeated identical utterances arriving close together.
+`match_medium`, and `match_low` in sequence. A size of 3 is enough to
+absorb one utterance across all three tiers. Raise it only if you have
+evidence of repeated identical utterances arriving close together.
 
 ## When tuning won't help
 
 - The user's phrasing has *no* token overlap with any sample. The SVM sees
   an all-zero feature vector and can't pick anything. Solution: register
   more diverse samples, or accept that this query genuinely isn't covered.
-- Two intents share most of their vocabulary (e.g. "play music" vs "stop
-  music"). The bag-of-words model can't separate them on word order. This
-  is a structural limitation of linha-fina, not a tuning problem — pick a
-  matcher that uses positional features.
+- Two intents share most of their vocabulary (for example "play music" vs
+  "stop music"). The bag-of-words model cannot separate them on word
+  order. This is a structural limitation of linha-fina, not a tuning
+  problem. Pick a matcher that uses positional features.
 
 See [Troubleshooting](troubleshooting.md) for diagnostic steps when a
 specific utterance misbehaves.
+
+---
+[← Domain pipeline](domain_pipeline.md) · [Home](index.md) · [Troubleshooting →](troubleshooting.md)
