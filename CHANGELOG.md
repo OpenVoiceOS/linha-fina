@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.0a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.3.0a1...0.4.0a1)
+
+**Merged pull requests:**
+
+- feat: add HierarchicalIntentEngine two-stage intent variant [\#12](https://github.com/OpenVoiceOS/linha-fina/pull/12) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.3.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.3.0a1) (2026-06-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a2...0.3.0a1)
