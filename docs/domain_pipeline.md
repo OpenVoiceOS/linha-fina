@@ -65,3 +65,6 @@ per-domain minimum — a skill that exposes a single intent is still
 perfectly matchable as long as the corpus as a whole has enough intents
 to train the SVMs. The constraint is identical to the flat
 `LinhaFinaPipeline`: ≥3 intents in total.
+
+---
+[← OPM pipeline](pipeline.md) · [Home](index.md) · [Tuning →](tuning.md)
