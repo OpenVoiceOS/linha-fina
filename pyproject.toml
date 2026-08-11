@@ -29,6 +29,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "ovoscope>=0.17.1a1"]
+benchmark = ["padaos", "padatious", "fann2==1.0.7", "nebulento", "datasets"]
 
 [tool.coverage.run]
 source = ["linha_fina"]
@@ -47,6 +48,7 @@ Homepage = "https://github.com/TigreGotico/linha-fina"
 [project.entry-points."opm.pipeline"]
 "ovos-linha-fina-pipeline-plugin" = "linha_fina.opm:LinhaFinaPipeline"
 "ovos-linha-fina-domain-pipeline-plugin" = "linha_fina.opm:DomainLinhaFinaPipeline"
+"ovos-linha-fina-hierarchical-pipeline-plugin" = "linha_fina.hierarchical_opm:HierarchicalLinhaFinaPipeline"
 
 [tool.setuptools.dynamic]
 version = { attr = "linha_fina.version.__version__" }
