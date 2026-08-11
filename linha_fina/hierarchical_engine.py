@@ -94,6 +94,19 @@ class HierarchicalIntentEngine:
 
     # ── domain management ──────────────────────────────────────────────────
 
+    def train(self) -> None:
+        """Train the first-stage domain router and every per-domain engine.
+
+        Mirrors :meth:`IntentEngine.train` (and the same-named method on
+        :class:`DomainIntentEngine`), so the ``mycroft.ready`` initial-train
+        hook in the pipeline plugins can eagerly pre-train a hierarchical
+        engine instead of relying on lazy train-on-first-prediction.
+        """
+        self._sync_domain_classifier()
+        self.domain_engine.train()
+        for engine in self.domains.values():
+            engine.train()
+
     def remove_domain(self, domain_name: str) -> None:
         """Remove a domain and all its intents, entities, and training data."""
         self.training_data.pop(domain_name, None)

@@ -67,6 +67,18 @@ class DomainIntentEngine:
         self.training_data.pop(domain_name, None)
         self.domains.pop(domain_name, None)
 
+    def train(self) -> None:
+        """Train every per-domain :class:`IntentEngine`.
+
+        Mirrors :meth:`IntentEngine.train`, so callers (e.g. the
+        ``mycroft.ready`` initial-train hook in ``LinhaFinaPipeline``) can
+        eagerly pre-train a :class:`DomainIntentEngine` the same way they
+        pre-train a flat one, instead of relying on the lazy
+        train-on-first-prediction behaviour of the underlying engines.
+        """
+        for engine in self.domains.values():
+            engine.train()
+
     # ── intent management ──────────────────────────────────────────────────
 
     def register_domain_intent(self, domain_name: str, intent_name: str,

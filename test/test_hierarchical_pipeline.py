@@ -164,3 +164,40 @@ def test_pipeline_instantiates():
     assert pipe.lang
     assert pipe.containers
     pipe.shutdown()
+
+
+def test_handle_initial_train_pretrains_hierarchical_engines(pipe):
+    # Regression: `mycroft.ready` calls `.train()` on every per-lang
+    # container; HierarchicalIntentEngine had no `.train()` -> AttributeError
+    # (same defect as DomainIntentEngine, see test_domain_pipeline).
+    # two intents per domain: a domain with a single intent has no negative
+    # samples, so its classifier legitimately cannot train eagerly (stays
+    # lazy by design) — eager pre-training is only observable with >=2.
+    pipe.register_intent(_make_register_msg(
+        "media.skill:play",
+        ["play music", "put on a song", "play africa", "start the playlist"],
+        lang=pipe.lang))
+    pipe.register_intent(_make_register_msg(
+        "media.skill:stop",
+        ["stop the music", "halt playback", "pause the song",
+         "stop the playlist"],
+        lang=pipe.lang))
+    pipe.register_intent(_make_register_msg(
+        "weather.skill:forecast",
+        ["what is the weather", "will it rain", "forecast for tomorrow",
+         "is it sunny outside"],
+        lang=pipe.lang))
+    pipe.register_intent(_make_register_msg(
+        "weather.skill:temperature",
+        ["how hot is it", "current temperature", "how cold is it outside",
+         "temperature right now"],
+        lang=pipe.lang))
+
+    engine = pipe.containers[pipe.lang]
+    assert engine.domain_engine.clf._needs_training is True
+
+    pipe.handle_initial_train(Message("mycroft.ready", {}))
+
+    assert engine.domain_engine.clf._needs_training is False
+    for sub in engine.domains.values():
+        assert sub.clf._needs_training is False
