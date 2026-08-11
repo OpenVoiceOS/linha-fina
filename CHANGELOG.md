@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1a3](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a3) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a2...0.4.1a3)
+
+**Merged pull requests:**
+
+- chore/fix: drop vestigial fann2 dep, seed DynamicClassifier MLP [\#25](https://github.com/OpenVoiceOS/linha-fina/pull/25) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.4.1a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a2) (2026-08-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a1...0.4.1a2)
