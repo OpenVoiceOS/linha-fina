@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a2) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a1...0.4.1a2)
+
+**Merged pull requests:**
+
+- docs: rewrite README in Simplified Technical English [\#19](https://github.com/OpenVoiceOS/linha-fina/pull/19) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.4.1a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a1) (2026-08-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.0a1...0.4.1a1)
