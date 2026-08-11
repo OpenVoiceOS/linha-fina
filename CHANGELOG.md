@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.0a1...0.4.1a1)
+
+**Merged pull requests:**
+
+- fix: eager train\(\) for Domain/Hierarchical intent engines [\#22](https://github.com/OpenVoiceOS/linha-fina/pull/22) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.4.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.0a1) (2026-08-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.3.0a1...0.4.0a1)
