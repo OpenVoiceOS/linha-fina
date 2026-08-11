@@ -40,10 +40,13 @@ class TestExpandTemplate:
         assert "sentence can have suffixes mid word too" in result
 
     def test_optional_whole_clause(self):
-        result = expand_template("[(this|that) is optional]")
-        assert "this is optional" in result
-        assert "that is optional" in result
-        assert "" in result
+        # Per OVOS-INTENT-1 §3.6, templates yielding an empty sample are
+        # malformed. The legacy implementation silently produced an empty
+        # string; ovos_spec_tools.expand rejects it.
+        import pytest
+        from ovos_spec_tools import MalformedTemplate
+        with pytest.raises(MalformedTemplate):
+            expand_template("[(this|that) is optional]")
 
     def test_slot_placeholders_preserved(self):
         result = expand_template("tell me a [{joke_type}] joke")

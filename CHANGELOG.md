@@ -1,30 +1,60 @@
 # Changelog
 
-## [0.1.0a1](https://github.com/TigreGotico/linha-fina/tree/0.1.0a1) (2026-05-20)
+## [0.4.1a3](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a3) (2026-08-11)
 
-[Full Changelog](https://github.com/TigreGotico/linha-fina/compare/0.0.1a3...0.1.0a1)
-
-**Merged pull requests:**
-
-- feat: add DomainIntentEngine and DomainLinhaFinaPipeline [\#3](https://github.com/TigreGotico/linha-fina/pull/3) ([JarbasAl](https://github.com/JarbasAl))
-
-## [0.0.1a3](https://github.com/TigreGotico/linha-fina/tree/0.0.1a3) (2026-05-20)
-
-[Full Changelog](https://github.com/TigreGotico/linha-fina/compare/0.0.1a2...0.0.1a3)
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a2...0.4.1a3)
 
 **Merged pull requests:**
 
-- test: extensive unit + OPM pipeline tests \(89% coverage\) [\#9](https://github.com/TigreGotico/linha-fina/pull/9) ([JarbasAl](https://github.com/JarbasAl))
+- chore/fix: drop vestigial fann2 dep, seed DynamicClassifier MLP [\#25](https://github.com/OpenVoiceOS/linha-fina/pull/25) ([JarbasAl](https://github.com/JarbasAl))
 
-## [0.0.1a2](https://github.com/TigreGotico/linha-fina/tree/0.0.1a2) (2026-05-20)
+## [0.4.1a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a2) (2026-08-11)
 
-[Full Changelog](https://github.com/TigreGotico/linha-fina/compare/ae577f750d4d07f3cb28c6bee3d8a7886f68309b...0.0.1a2)
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a1...0.4.1a2)
 
 **Merged pull requests:**
 
-- docs: add initial documentation [\#7](https://github.com/TigreGotico/linha-fina/pull/7) ([JarbasAl](https://github.com/JarbasAl))
-- ci: add standard workflows and migrate to pyproject.toml [\#6](https://github.com/TigreGotico/linha-fina/pull/6) ([JarbasAl](https://github.com/JarbasAl))
-- chore: Configure Renovate [\#1](https://github.com/TigreGotico/linha-fina/pull/1) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: rewrite README in Simplified Technical English [\#19](https://github.com/OpenVoiceOS/linha-fina/pull/19) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.4.1a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.0a1...0.4.1a1)
+
+**Merged pull requests:**
+
+- fix: eager train\(\) for Domain/Hierarchical intent engines [\#22](https://github.com/OpenVoiceOS/linha-fina/pull/22) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.4.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.0a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.3.0a1...0.4.0a1)
+
+**Merged pull requests:**
+
+- feat: add HierarchicalIntentEngine two-stage intent variant [\#12](https://github.com/OpenVoiceOS/linha-fina/pull/12) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.3.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.3.0a1) (2026-06-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a2...0.3.0a1)
+
+**Merged pull requests:**
+
+- feat: adopt INTENT-4 spec registration topics \(§6 template\) + dual-namespace e2e [\#17](https://github.com/OpenVoiceOS/linha-fina/pull/17) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.2.0a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.2.0a2) (2026-06-13)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.2.0a1...0.2.0a2)
+
+**Merged pull requests:**
+
+- docs: standardize NGI0 Commons Fund attribution [\#15](https://github.com/OpenVoiceOS/linha-fina/pull/15) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.2.0a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.2.0a1) (2026-05-23)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.1.0...0.2.0a1)
+
+**Merged pull requests:**
+
+- feat: migrate to ovos-spec-tools [\#13](https://github.com/OpenVoiceOS/linha-fina/pull/13) ([JarbasAl](https://github.com/JarbasAl))
 
 
 

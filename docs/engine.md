@@ -1,6 +1,6 @@
 # Engine API
 
-Reference for `linha_fina.engine.IntentEngine` — the high-level orchestrator
+Reference for `linha_fina.engine.IntentEngine`, the high-level orchestrator
 that combines the SVM classifier, template matcher, and keyword extractor.
 
 For deeper internals see [Components](components.md). For the OVOS plugin
@@ -18,7 +18,7 @@ Create a new engine.
 
 | arg | type | default | meaning |
 |---|---|---|---|
-| `instant_train` | bool | `False` | If `True`, call `train()` automatically after every `register_intent` / `register_entity`. Convenient for REPL exploration; expensive in production where you want batched registration followed by a single `train()`. |
+| `instant_train` | bool | `False` | If `True`, call `train()` automatically after every `register_intent` / `register_entity`. Convenient for REPL exploration. Expensive in production, where you want batched registration followed by a single `train()`. |
 
 When `instant_train=False` (the default), training is **lazy**: the engine
 sets an internal "needs training" flag on each registration and only fits
@@ -38,7 +38,7 @@ eng.register_intent(
 
 | arg | type | meaning |
 |---|---|---|
-| `name` | `str` | Intent label. In the OPM pipeline this is `"{skill_id}:{intent_name}"`; in raw use any string works. |
+| `name` | `str` | Intent label. In the OPM pipeline this is `"{skill_id}:{intent_name}"`. In raw use, any string works. |
 | `samples` | `list[str]` | Example utterances. May contain `{slot}` placeholders. Templates with `[optional]` or `(alt\|alt)` syntax are auto-expanded into all permutations before being fed to the matcher. |
 | `entity_samples` | `dict[str, list[str]] \| None` | Per-slot value lists used both as keyword vocabulary and as training data for the SVM (slots are filled with each value to create more positive samples). |
 
@@ -64,9 +64,9 @@ Add keyword values for an entity slot.
 | `samples` | List of literal strings to match. |
 | `intent_name` | If given, scope the entity to that intent only. If `None`, the entity is global and may be matched for any intent that declares it as a slot. |
 
-Useful when entity values arrive separately from intent samples — e.g. a
-skill registers `"play"` at startup and pushes new songs into the `song`
-entity as the user's library is indexed.
+Use this when entity values arrive separately from intent samples. For
+example, a skill registers `"play"` at startup and pushes new songs into
+the `song` entity as the user's library is indexed.
 
 ### `remove_entity(name, intent_name=None)`
 
@@ -76,9 +76,9 @@ Inverse of `register_entity`.
 
 ### `train()`
 
-Fits the SVM(s) over the current intent + entity state. Idempotent and safe
-to call repeatedly — the engine tracks dirty flags and skips work if nothing
-changed.
+Fits the SVM(s) over the current intent and entity state. Idempotent and
+safe to call repeatedly. The engine tracks dirty flags and skips work if
+nothing changed.
 
 Raises if fewer than 3 intents are registered (multi-class one-vs-rest
 requires at least three positive classes to be meaningful).
@@ -142,3 +142,6 @@ for utt in ["put on africa", "shut up", "skip this one"]:
 'shut up'                      → stop   conf=0.84 slots={}
 'skip this one'                → next   conf=0.72 slots={}
 ```
+
+---
+[← Quickstart](quickstart.md) · [Home](index.md) · [Components →](components.md)

@@ -4,15 +4,14 @@ from functools import lru_cache
 from os.path import isfile
 from typing import Optional, Dict, List, Union
 
-from langcodes import closest_match
 from ovos_bus_client.client import MessageBusClient
 from ovos_bus_client.message import Message
-from ovos_bus_client.session import SessionManager, Session
+from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
 from ovos_plugin_manager.templates.pipeline import ConfidenceMatcherPipeline, IntentHandlerMatch
+from ovos_spec_tools import SpecMessage, closest_lang, standardize_lang
 from ovos_utils import flatten_list
 from ovos_utils.fakebus import FakeBus
-from ovos_utils.lang import standardize_lang_tag
 from ovos_utils.log import LOG
 
 from linha_fina.domain_engine import DomainIntentEngine
@@ -57,25 +56,47 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
         super().__init__(config=config or {}, bus=bus)
 
         core_config = Configuration()
-        self.lang = standardize_lang_tag(core_config.get("lang", "en-US"))
+        self.lang = standardize_lang(core_config.get("lang", "en-US"))
         langs = core_config.get('secondary_langs') or []
         if self.lang not in langs:
             langs.append(self.lang)
-        langs = [standardize_lang_tag(l) for l in langs]
+        langs = [standardize_lang(l) for l in langs]
         self.conf_high = self.config.get("conf_high") or 0.8
         self.conf_med = self.config.get("conf_med") or 0.6
         self.conf_low = self.config.get("conf_low") or 0.4
 
         self.containers = {lang: self._make_engine() for lang in langs}
 
+        # legacy (padatious-compatible) registration surface
         self.bus.on('padatious:register_intent', self.register_intent)
         self.bus.on('padatious:register_entity', self.register_entity)
         self.bus.on('detach_intent', self.handle_detach_intent)
         self.bus.on('detach_skill', self.handle_detach_skill)
         self.bus.on('mycroft.ready', self.handle_initial_train)
 
+        # OVOS-INTENT-4 registration surface (alongside the legacy one).
+        # LinhaFina is a sample/template matcher, so it consumes the template
+        # registration topic (§6) but NOT the keyword topic (§5/§11).
+        self.bus.on(SpecMessage.INTENT_REGISTER_TEMPLATE.value,
+                    self.handle_register_template)
+        self.bus.on(SpecMessage.ENTITY_REGISTER.value,
+                    self.handle_register_entity_spec)
+        self.bus.on(SpecMessage.INTENT_DEREGISTER.value,
+                    self.handle_deregister_intent_spec)
+        self.bus.on(SpecMessage.ENTITY_DEREGISTER.value,
+                    self.handle_deregister_entity_spec)
+        self.bus.on(SpecMessage.SKILL_DEREGISTER.value,
+                    self.handle_deregister_skill_spec)
+        self.bus.on(SpecMessage.INTENT_ENABLE.value,
+                    self.handle_enable_intent_spec)
+        self.bus.on(SpecMessage.INTENT_DISABLE.value,
+                    self.handle_disable_intent_spec)
+
         self.registered_intents = []
         self.registered_entities = []
+        # INTENT-4 §8.5 — intents disabled without losing their definition;
+        # excluded from match candidacy until re-enabled.
+        self.disabled_intents: set = set()
         self.max_words = 50  # if an utterance contains more words than this, don't attempt to match
         LOG.debug('Loaded LinhaFina intent parser.')
 
@@ -128,7 +149,7 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
         LOG.debug(f'LinhaFina Matching confidence > {limit}')
         # call flatten in case someone is sending the old style list of tuples
         utterances = flatten_list(utterances)
-        lang = standardize_lang_tag(lang or self.lang)
+        lang = standardize_lang(lang or self.lang)
         lf_intent = self.calc_intent(utterances, lang, message)
         if lf_intent is not None and lf_intent.conf > limit:
             skill_id = lf_intent.name.split(':')[0]
@@ -210,7 +231,7 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
     def register_intent(self, message):
         """Messagebus handler for registering intents."""
         lang = message.data.get('lang', self.lang)
-        lang = standardize_lang_tag(lang)
+        lang = standardize_lang(lang)
         if lang in self.containers:
             name, samples = self._extract_samples(message, 'intent')
             if name is None:
@@ -221,13 +242,105 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
     def register_entity(self, message):
         """Messagebus handler for registering entities."""
         lang = message.data.get('lang', self.lang)
-        lang = standardize_lang_tag(lang)
+        lang = standardize_lang(lang)
         if lang in self.containers:
             name, samples = self._extract_samples(message, 'entity')
             if name is None:
                 return
             self.registered_entities.append(message.data)
             self._add_entity(lang, name, samples)
+
+    # ── OVOS-INTENT-4 registration surface ──────────────────────────────────
+
+    @staticmethod
+    def _spec_label(message, key: str) -> Optional[str]:
+        """Build the internal ``skill_id:<key>`` label from an INTENT-4 payload.
+
+        INTENT-4 carries ``skill_id`` and ``intent_name`` / ``entity_name`` as
+        separate fields (§3.2); LinhaFina keys everything on the combined
+        ``skill_id:name`` label, matching the legacy padatious convention.
+        """
+        skill_id = message.data.get("skill_id")
+        name = message.data.get(key)
+        if not skill_id or not name:
+            LOG.warning(f"Ignoring malformed INTENT-4 payload on {message.msg_type!r}: "
+                        f"missing skill_id/{key}")
+            return None
+        return f"{skill_id}:{name}"
+
+    def handle_register_template(self, message):
+        """Consume ``ovos.intent.register.template`` (INTENT-4 §6).
+
+        Template intents are LinhaFina's native definition method. The payload
+        carries inline ``samples`` (OVOS-INTENT-1 templates); ``blacklist`` is a
+        suppression hint LinhaFina does not yet honour and is ignored.
+        """
+        lang = standardize_lang(message.data.get("lang", self.lang))
+        if lang not in self.containers:
+            return
+        name = self._spec_label(message, "intent_name")
+        if name is None:
+            return
+        samples = message.data.get("samples")
+        if not samples:
+            LOG.warning(f"Ignoring INTENT-4 template registration for {name!r}: "
+                        f"empty samples")
+            return
+        self.registered_intents.append(name)
+        self._add_intent(lang, name, samples)
+
+    def handle_register_entity_spec(self, message):
+        """Consume ``ovos.entity.register`` (INTENT-4 §7)."""
+        lang = standardize_lang(message.data.get("lang", self.lang))
+        if lang not in self.containers:
+            return
+        name = self._spec_label(message, "entity_name")
+        if name is None:
+            return
+        samples = message.data.get("samples")
+        if not samples:
+            LOG.warning(f"Ignoring INTENT-4 entity registration for {name!r}: "
+                        f"empty samples")
+            return
+        self.registered_entities.append({"name": name, "lang": lang,
+                                         "samples": samples})
+        self._add_entity(lang, name, samples)
+
+    def handle_deregister_intent_spec(self, message):
+        """Consume ``ovos.intent.deregister`` (INTENT-4 §8.2)."""
+        name = self._spec_label(message, "intent_name")
+        if name is None:
+            return
+        self._detach_intent(name)
+        self.disabled_intents.discard(name)
+
+    def handle_deregister_entity_spec(self, message):
+        """Consume ``ovos.entity.deregister`` (INTENT-4 §8.3)."""
+        name = self._spec_label(message, "entity_name")
+        if name is None:
+            return
+        lang = standardize_lang(message.data.get("lang", self.lang))
+        self._remove_entity(name, lang)
+        self.registered_entities = [
+            en for en in self.registered_entities if en.get("name") != name
+        ]
+
+    def handle_deregister_skill_spec(self, message):
+        """Consume ``ovos.skill.deregister`` (INTENT-4 §8.4)."""
+        # payload shape matches detach_skill — reuse the legacy handler
+        self.handle_detach_skill(message)
+
+    def handle_enable_intent_spec(self, message):
+        """Consume ``ovos.intent.enable`` (INTENT-4 §8.5)."""
+        name = self._spec_label(message, "intent_name")
+        if name is not None:
+            self.disabled_intents.discard(name)
+
+    def handle_disable_intent_spec(self, message):
+        """Consume ``ovos.intent.disable`` (INTENT-4 §8.5)."""
+        name = self._spec_label(message, "intent_name")
+        if name is not None:
+            self.disabled_intents.add(name)
 
     def calc_intent(self, utterances: List[str], lang: str = None,
                     message: Optional[Message] = None) -> Optional[LinhaFinaIntent]:
@@ -254,24 +367,29 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
 
         sess = SessionManager.get(message)
 
+        # Invalidate the match cache once per call: (de)registrations mutate the
+        # engine between calls, and a stale cache entry would keep a removed
+        # intent matching.
+        _calc_lf_intent.cache_clear()
+
         intent_container = self.containers.get(lang)
-        intents = [_calc_lf_intent(utt, intent_container, sess)
+        # Pass the blacklists as hashable frozensets rather than the Session
+        # object — ovos-bus-client>=2.5.1a1 makes Session unhashable, which
+        # would raise "unhashable type: 'Session'" at the lru_cache key.
+        bl_intents = frozenset(sess.blacklisted_intents or [])
+        bl_skills = frozenset(sess.blacklisted_skills or [])
+        intents = [_calc_lf_intent(utt, intent_container, bl_intents, bl_skills)
                    for utt in utterances]
-        intents = [i for i in intents if i is not None]
+        # INTENT-4 §8.5 — disabled intents are excluded from match candidacy
+        intents = [i for i in intents
+                   if i is not None and i.name not in self.disabled_intents]
         # select best
         if intents:
             return max(intents, key=lambda k: k.conf)
 
     def _get_closest_lang(self, lang: str) -> Optional[str]:
         if self.containers:
-            lang = standardize_lang_tag(lang)
-            closest, score = closest_match(lang, list(self.containers.keys()))
-            # https://langcodes-hickford.readthedocs.io/en/sphinx/index.html#distance-values
-            # 0 -> These codes represent the same language, possibly after filling in values and normalizing.
-            # 1- 3 -> These codes indicate a minor regional difference.
-            # 4 - 10 -> These codes indicate a significant but unproblematic regional difference.
-            if score < 10:
-                return closest
+            return closest_lang(lang, list(self.containers.keys()))
         return None
 
     def shutdown(self):
@@ -279,6 +397,20 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
         self.bus.remove('padatious:register_entity', self.register_entity)
         self.bus.remove('detach_intent', self.handle_detach_intent)
         self.bus.remove('detach_skill', self.handle_detach_skill)
+        self.bus.remove(SpecMessage.INTENT_REGISTER_TEMPLATE.value,
+                        self.handle_register_template)
+        self.bus.remove(SpecMessage.ENTITY_REGISTER.value,
+                        self.handle_register_entity_spec)
+        self.bus.remove(SpecMessage.INTENT_DEREGISTER.value,
+                        self.handle_deregister_intent_spec)
+        self.bus.remove(SpecMessage.ENTITY_DEREGISTER.value,
+                        self.handle_deregister_entity_spec)
+        self.bus.remove(SpecMessage.SKILL_DEREGISTER.value,
+                        self.handle_deregister_skill_spec)
+        self.bus.remove(SpecMessage.INTENT_ENABLE.value,
+                        self.handle_enable_intent_spec)
+        self.bus.remove(SpecMessage.INTENT_DISABLE.value,
+                        self.handle_disable_intent_spec)
 
 
 def _split_intent_label(label: str):
@@ -361,6 +493,9 @@ class DomainLinhaFinaPipeline(LinhaFinaPipeline):
                 continue
             if m is None or m.name is None:
                 continue
+            # INTENT-4 §8.5 — disabled intents are excluded from match candidacy
+            if m.name in self.disabled_intents:
+                continue
             if best is None or m.conf > best.conf:
                 best = LinhaFinaIntent(sent=utt, name=m.name,
                                        conf=m.conf, matches=m.slots)
@@ -368,9 +503,15 @@ class DomainLinhaFinaPipeline(LinhaFinaPipeline):
 
 
 @lru_cache(maxsize=3)  # repeat calls under different conf levels wont re-run code
-def _calc_lf_intent(utt: str, intent_container: IntentEngine, sess: Session) -> Optional[LinhaFinaIntent]:
+def _calc_lf_intent(utt: str, intent_container: IntentEngine,
+                    blacklisted_intents: frozenset = frozenset(),
+                    blacklisted_skills: frozenset = frozenset()) -> Optional[LinhaFinaIntent]:
     """
-    Try to match an utterance to an intent in an intent_container
+    Try to match an utterance to an intent in an intent_container, respecting
+    the session blacklists.
+
+    The session blacklists are passed as hashable frozensets so this stays
+    ``lru_cache``-able (Session is unhashable under ovos-bus-client>=2.5.1a1).
 
     @return: matched LinhaFinaIntent
     """
@@ -378,8 +519,8 @@ def _calc_lf_intent(utt: str, intent_container: IntentEngine, sess: Session) -> 
         intents = [i for i in intent_container.predict(utt)
                    if i is not None
                    and i.conf >= 0.2
-                   and i.name not in sess.blacklisted_intents
-                   and i.name.split(":")[0] not in sess.blacklisted_skills]
+                   and i.name not in blacklisted_intents
+                   and i.name.split(":")[0] not in blacklisted_skills]
         LOG.debug(f"LinhaFina Intents: {intents}")
         if len(intents) == 0:
             return None

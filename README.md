@@ -1,24 +1,35 @@
 # Linha Fina
 
-A IntentEngine that dynamically accounts for changing reference data at runtime. Add/remove intents dynamically
+`linha-fina` is an intent engine that adapts to changing reference data at
+run time. It adds and removes intents dynamically, without a fixed training
+pass over the whole intent set.
 
 How it works:
 
 - each intent is an independent SVM that classifies intent vs not-intent
-- each intent uses the other intents data as "not-intent" training data
-- only most relevant negative samples are used for training (calculated via [token_set_ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-set-ratio))
-- features are just [one-hot-encoded](https://en.wikipedia.org/wiki/One-hot) keyword vectors
-- entity extraction from templates via [simplematch](https://github.com/tfeldmann/simplematch)
-- entity extraction based on wordlists, optionally via [aho-corasick](https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm)
-
+- each intent uses the other intents' data as "not-intent" training data
+- only the most relevant negative samples are used for training, ranked by
+  [token_set_ratio](https://rapidfuzz.github.io/RapidFuzz/Usage/fuzz.html#token-set-ratio)
+- features are [one-hot-encoded](https://en.wikipedia.org/wiki/One-hot) keyword vectors
+- entity extraction from templates uses [simplematch](https://github.com/tfeldmann/simplematch)
+- entity extraction from wordlists optionally uses [Aho-Corasick](https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm)
 
 Limitations:
-- long warm up time (training happens on first inference)
-- doesn't scale well to a large number of intents
+- long warm-up time (training happens on first inference)
+- does not scale well to a large number of intents
 - does not take word position into account
 - needs retraining whenever a new intent is added
 
+See the [docs](docs/index.md) for concepts, a quickstart, the full API
+reference, and tuning and troubleshooting guides.
+
 ![img.png](img.png)
+
+## Install
+
+```bash
+pip install linha-fina
+```
 
 ## Usage
 
@@ -81,3 +92,25 @@ for s in ["hello earth",
     # make color green
     # IntentMatch(name='change_color', slots={'color': 'green'}, conf=0.9142364945872282)
 ```
+
+---
+
+## Related projects
+
+- [OpenVoiceOS/ovos-intent-benchmark](https://github.com/OpenVoiceOS/ovos-intent-benchmark) compares `linha-fina` against other intent engines, including [MycroftAI/padatious](https://github.com/MycroftAI/padatious), the engine `linha-fina` is architecturally based on.
+- [OpenVoiceOS/OVOS-plugin-manager](https://github.com/OpenVoiceOS/OVOS-plugin-manager) defines the `opm.pipeline` plugin interface `linha-fina` implements.
+
+## Credits
+
+Originally an experimental research project by
+[**TigreGóticoLda**](https://tigregotico.pt), polished and donated to
+[OpenVoiceOS](https://openvoiceos.org). Its modernization, integration into
+OpenVoiceOS, and intent benchmarking were funded by the NGI0 Commons Fund.
+
+[![NGI0 Commons Fund](./ngi.png)](https://nlnet.nl/project/OpenVoiceOS)
+
+This project was funded through the [NGI0 Commons Fund](https://nlnet.nl/commonsfund),
+a fund established by [NLnet](https://nlnet.nl) with financial support from the
+European Commission's [Next Generation Internet](https://ngi.eu) programme, under
+the aegis of [DG Communications Networks, Content and Technology](https://commission.europa.eu/about-european-commission/departments-and-executive-agencies/communications-networks-content-and-technology_en)
+under grant agreement No [101135429](https://cordis.europa.eu/project/id/101135429).

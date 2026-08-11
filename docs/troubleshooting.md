@@ -146,3 +146,6 @@ linha-fina never gets called.
 **Step 3: language.** The pipeline only registers languages listed in
 `lang` + `secondary_langs`. If a skill registers intents for `de-DE` but
 OVOS isn't configured for German, those intents go nowhere.
+
+---
+[← Tuning](tuning.md) · [Home](index.md)

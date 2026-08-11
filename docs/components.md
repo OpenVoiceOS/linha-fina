@@ -1,7 +1,7 @@
 # Components
 
-`IntentEngine` is the public face; under the hood it composes three
-independently-usable pieces. This page documents each one so you can use
+`IntentEngine` is the public face. Under the hood it composes three
+independently usable pieces. This page documents each one so you can use
 them standalone, replace them, or understand why a prediction came out the
 way it did.
 
@@ -56,7 +56,7 @@ kw.one_hot_encode("play africa")
 ```
 
 This is what the SVM trains and predicts on. It is order-agnostic by
-construction — that's the major limitation flowing up to the engine.
+construction. That is the major limitation flowing up to the engine.
 
 ### Backends
 
@@ -104,7 +104,7 @@ tm.match("put on africa")
 ```
 
 `match` returns extracted slot dicts sorted by descending fuzzy score
-(`rapidfuzz.fuzz.token_set_ratio`). The first hit is the best.
+(`rapidfuzz.fuzz.token_set_ratio`). The first hit is the best match.
 
 ### Expansion helpers
 
@@ -129,12 +129,12 @@ Matching combines two libraries:
   pattern + slot capture).
 - **rapidfuzz** ranks matched templates by token-set similarity to the input.
 
-Templates that don't fit at all are dropped; the rest are scored and sorted.
+Templates that don't fit at all are dropped. The rest are scored and sorted.
 
 ## DynamicClassifier
 
 A one-vs-rest stack of binary SVMs. Each registered label gets its own
-`DynamicBinaryClassifier`; predicting an utterance evaluates all of them
+`DynamicBinaryClassifier`. Predicting an utterance evaluates all of them
 and returns `{label: probability}`.
 
 ### DynamicBinaryClassifier
@@ -159,8 +159,8 @@ Internals:
   the most ambiguous ones (highest `token_set_ratio` to the first positive),
   on the theory that the *hardest* negatives produce the tightest decision
   boundary.
-- Featurization is one-hot via a shared `KeywordFeatures` instance — same
-  vocab used everywhere in the engine.
+- Featurization is one-hot via a shared `KeywordFeatures` instance, the
+  same vocabulary used everywhere in the engine.
 
 ### DynamicClassifier
 
@@ -181,7 +181,7 @@ clf.predict("play wonderwall")
   engine trains roughly as fast as the slowest single classifier, not 50×
   one).
 - `eval_fp()` evaluates the false-positive rate by predicting every
-  unregistered sample's classifier on every other label — useful when tuning
+  unregistered sample's classifier on every other label. Use it when tuning
   thresholds.
 - Requires **≥3 labels** before `train()` will produce useful classifiers
   (the negatives need somewhere to come from).
@@ -196,7 +196,10 @@ clf.predict("play wonderwall")
    and `KeywordFeatures.extract` (slot extraction, small boost on hit).
 4. Sort, return.
 
-If you need different orchestration — e.g. template-first with SVM as
-tiebreak, or different boost/penalty weights — subclassing `IntentEngine`
-and overriding `predict` is straightforward. The underlying components have
-no opinion about how they're combined.
+If you need different orchestration, for example template-first with the
+SVM as tiebreak, or different boost and penalty weights, subclass
+`IntentEngine` and override `predict`. The underlying components have
+no opinion about how they are combined.
+
+---
+[← Engine API](engine.md) · [Home](index.md) · [OPM pipeline →](pipeline.md)

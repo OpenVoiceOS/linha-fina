@@ -150,3 +150,6 @@ tiers.
   SVM, template, and keyword subsystems — useful when tuning or extending.
 - **Tuning:** [Tuning](tuning.md) covers thresholds, training modes, and the
   Aho-Corasick keyword backend.
+
+---
+[← Concepts](concepts.md) · [Home](index.md) · [Engine API →](engine.md)
