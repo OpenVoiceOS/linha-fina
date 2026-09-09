@@ -117,8 +117,10 @@ class TestLegacyStillConsumed(_Intent4LinhaFinaHarness):
     def test_legacy_template_registration_still_matches(self):
         from ovoscope import register_padatious_intent
         # two labels so the kNN classifier has a contrast to train against
-        register_padatious_intent(self.bus, f"{self.SKILL_ID}:hello", _HELLO)
-        register_padatious_intent(self.bus, f"{self.SKILL_ID}:bye", _BYE)
+        register_padatious_intent(self.bus, f"{self.SKILL_ID}:hello", _HELLO,
+                                  skill_id=self.SKILL_ID)
+        register_padatious_intent(self.bus, f"{self.SKILL_ID}:bye", _BYE,
+                                  skill_id=self.SKILL_ID)
         time.sleep(1.0)
         msg = self._capture_match("goodbye", "bye")
         self.assertIsNotNone(msg, "legacy registration must still match")
