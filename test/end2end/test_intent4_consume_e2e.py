@@ -19,12 +19,6 @@ before it will train, so the spec-consumption tests register a contrast pair
 import time
 import unittest
 
-import pytest
-
-ovoscope = pytest.importorskip(
-    "ovoscope", reason="ovoscope not installed; skipping E2E tests"
-)
-
 from ovoscope import E2EPipelineHarness  # noqa: E402
 from ovos_bus_client.message import Message  # noqa: E402
 from ovos_spec_tools import SpecMessage  # noqa: E402
@@ -121,8 +115,8 @@ class TestLegacyStillConsumed(_Intent4LinhaFinaHarness):
         register_padatious_intent(self.bus, f"{self.SKILL_ID}:bye", _BYE, skill_id=self.SKILL_ID)
         time.sleep(1.0)
         msg = self._capture_match("goodbye", "bye")
-        self.assertIsNotNone(msg, "legacy registration must still match")
-        self.assertEqual(msg.msg_type, f"{self.SKILL_ID}:bye")
+        self.assertEqual(msg.msg_type, f"{self.SKILL_ID}:bye",
+                         "legacy registration must still match")
 
 
 class TestSpecDeregister(_Intent4LinhaFinaHarness):
