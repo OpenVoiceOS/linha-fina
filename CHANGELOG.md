@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.2a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.2a1) (2026-09-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a3...0.4.2a1)
+
+**Merged pull requests:**
+
+- fix: pass skill\_id to ovoscope registrations and floor the test extra at ovoscope\>=1.8.2a1 [\#30](https://github.com/OpenVoiceOS/linha-fina/pull/30) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.4.1a3](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.1a3) (2026-08-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a2...0.4.1a3)
