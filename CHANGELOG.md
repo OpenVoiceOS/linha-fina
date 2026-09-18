@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.3a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.3a1) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.2a1...0.4.3a1)
+
+**Merged pull requests:**
+
+- fix: load a typed placeholder as the bare slot [\#32](https://github.com/OpenVoiceOS/linha-fina/pull/32) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.4.2a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.2a1) (2026-09-17)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.1a3...0.4.2a1)
