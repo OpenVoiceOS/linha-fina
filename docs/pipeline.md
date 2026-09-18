@@ -7,7 +7,7 @@ language, and exposes the three confidence-tier matchers OVOS expects.
 
 > **Reminder:** linha-fina is a benchmarking baseline. The pipeline plugin
 > ships so it can be slotted into a real OVOS install for A/B comparison
-> against padatious and successors — not because it's the recommended
+> against padatious and successors, not because it is the recommended
 > default. See [Concepts](concepts.md) for context.
 
 ## Entry point
@@ -47,23 +47,23 @@ for that language.
 
 ## Confidence tiers
 
-OVOS's `ConfidenceMatcherPipeline` contract has three matchers; each tier
-runs in a different phase of the intent service's pipeline so that high-
+OVOS's `ConfidenceMatcherPipeline` contract has three matchers. Each tier
+runs in a different phase of the intent service's pipeline, so high-
 confidence engines short-circuit before low-confidence ones get a chance.
 
 | Method | Phase | Use |
 |---|---|---|
 | `match_high(utterances, lang, message)` | Tried first, before any low-confidence engine | Only fires on the most certain matches |
 | `match_medium(utterances, lang, message)` | Mid-pipeline | Catches utterances the high tier passed on |
-| `match_low(utterances, lang, message)` | Last-resort | Permissive; useful as a fallback before unparsed |
+| `match_low(utterances, lang, message)` | Last-resort | Permissive, useful as a fallback before unparsed |
 
 All three call into the same `_match_level` helper with a different
 threshold. Below `conf_high` the high matcher returns `None` and OVOS
-proceeds; below all three the engine gives up entirely and the next pipeline
-plugin gets a turn.
+proceeds. Below all three, the engine gives up entirely and the next
+pipeline plugin gets a turn.
 
-There's also a hard floor of `0.2` applied inside `_calc_lf_intent` —
-predictions below this never escape the pipeline regardless of the tier
+There is also a hard floor of `0.2` applied inside `_calc_lf_intent`.
+Predictions below this never escape the pipeline, regardless of the tier
 thresholds.
 
 ## Messagebus protocol
@@ -77,7 +77,7 @@ without changes:
 | `padatious:register_entity` | `{name, samples, lang?}` | Calls `IntentEngine.register_entity`. |
 | `detach_intent` | `{intent_name}` | Removes the intent from all language containers. |
 | `detach_skill` | `{skill_id}` | Removes every intent whose name starts with `{skill_id}:`. |
-| `mycroft.ready` | — | Triggers `train()` on every language container. Without this, training is lazy and the first utterance pays the cost. |
+| `mycroft.ready` | none | Triggers `train()` on every language container. Without this, training is lazy and the first utterance pays the cost. |
 
 Intent names follow the convention `"{skill_id}:{intent_name}"`. The
 pipeline uses the prefix to populate `IntentHandlerMatch.skill_id`.
@@ -109,14 +109,17 @@ SVM evaluation.
 
 ## Limits
 
-- `max_words=50` — utterances longer than 50 whitespace-separated tokens are
-  skipped without inference (linha-fina is bag-of-words and would produce
-  noisy scores on long inputs).
+- `max_words=50`: utterances longer than 50 whitespace-separated tokens are
+  skipped without inference. linha-fina is bag-of-words and would produce
+  noisy scores on long inputs.
 - One engine per language. If you have 50 intents across 10 skills in 3
   languages, you hold 3 engines × 50 intents × ~1 small SVM each = 150
   binary classifiers. They're cheap individually.
 
 ## Going further
 
-- [Tuning](tuning.md) — practical knob-by-knob guide.
-- [Troubleshooting](troubleshooting.md) — "why didn't my intent fire?"
+- [Tuning](tuning.md): a practical knob-by-knob guide.
+- [Troubleshooting](troubleshooting.md): "why didn't my intent fire?"
+
+---
+[← Components](components.md) · [Home](index.md) · [Domain pipeline →](domain_pipeline.md)

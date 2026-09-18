@@ -133,3 +133,6 @@ the engine scales linearly in registered intents per language.
   warmup if latency on the first request matters.
 
 See [Tuning](tuning.md) for knobs that mitigate some of these.
+
+---
+[Home](index.md) · [Quickstart →](quickstart.md)

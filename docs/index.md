@@ -23,6 +23,7 @@ pip install linha-fina
 | Look up an API method, class, or constructor argument | [Engine API](engine.md) |
 | Dig into how each component (SVM, keywords, templates) works | [Components](components.md) |
 | Wire the engine into OVOS as an intent pipeline | [OPM pipeline](pipeline.md) |
+| Partition intents by skill instead of one flat engine | [Domain pipeline](domain_pipeline.md) |
 | Tune thresholds, training, and feature backends | [Tuning](tuning.md) |
 | Debug a misfire or "why isn't this matching?" | [Troubleshooting](troubleshooting.md) |
 

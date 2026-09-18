@@ -45,7 +45,7 @@ class DynamicBinaryClassifier:
         """
         Initializes an MLPClassifier with appropriate architecture based on featurizer labels.
         """
-        self.model = model or MLPClassifier()  # SVC(probability=True, random_state=42)
+        self.model = model or MLPClassifier(random_state=42)  # SVC(probability=True, random_state=42)
         if not hasattr(self.model, "predict_proba"):
             self.model = CalibratedClassifierCV(self.model)
 

@@ -132,6 +132,25 @@ class TestDynamicClassifier:
         # After 3 labels, instant_train should have produced models
         assert clf._needs_training is False
 
+    def test_training_is_reproducible_across_instances(self):
+        # Two independently trained classifiers on identical data must
+        # produce identical predictions — requires the underlying MLP
+        # to be seeded (random_state), otherwise weight init/SGD order
+        # differ between runs and scores diverge.
+        def build():
+            clf = DynamicClassifier()
+            clf.add_label("greet", ["hello", "hi there", "hey", "good morning"])
+            clf.add_label("bye", ["goodbye", "see you", "bye", "later"])
+            clf.add_label("thanks", ["thanks", "thank you", "much appreciated"])
+            clf.train()
+            return clf
+
+        clf1 = build()
+        clf2 = build()
+        scores1 = clf1.predict("hello there")
+        scores2 = clf2.predict("hello there")
+        assert scores1 == scores2
+
     def test_predict_after_remove_drops_label(self):
         clf = DynamicClassifier()
         clf.add_label("greet", ["hello", "hi", "hey"])

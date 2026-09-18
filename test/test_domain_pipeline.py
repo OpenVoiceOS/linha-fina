@@ -68,6 +68,31 @@ def test_parallel_argmax_routes_to_correct_domain(pipe):
     assert skill_id2 == "weather.skill"
 
 
+def test_handle_initial_train_pretrains_domain_engines(pipe):
+    # Regression: `mycroft.ready` used to call `.train()` on every per-lang
+    # container, but DomainIntentEngine (unlike the flat IntentEngine) had no
+    # `.train()` method of its own -> AttributeError, so pre-training silently
+    # never happened and every subsequent match failed until lazy
+    # train-on-first-prediction kicked in inside the per-domain engines.
+    pipe.register_intent(_make_register_msg(
+        "media.skill:play",
+        ["play music", "put on a song", "play africa", "start the playlist"],
+        lang=pipe.lang))
+    pipe.register_intent(_make_register_msg(
+        "media.skill:stop",
+        ["stop the music", "halt playback", "pause the song", "stop the playlist"],
+        lang=pipe.lang))
+
+    engine = pipe.containers[pipe.lang]
+    domain_engine = engine.domains["media.skill"]
+    assert domain_engine.clf._needs_training is True
+
+    # Must not raise AttributeError, and must actually train the sub-engines.
+    pipe.handle_initial_train(Message("mycroft.ready", {}))
+
+    assert domain_engine.clf._needs_training is False
+
+
 def test_detach_skill_removes_domain(pipe):
     for name, samples in [
         ("media.skill:play", ["play music", "play a song", "put on tunes", "play africa"]),
