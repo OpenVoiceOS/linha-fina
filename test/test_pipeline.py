@@ -118,6 +118,37 @@ class TestRegistrationViaBus:
         assert "hello world" in positives
         assert "hi there" in positives
 
+    def test_typed_placeholder_degrades_to_the_bare_slot(self, pipeline, tmp_path):
+        """OVOS-INTENT-1 3.4: a loader that does not implement typed slots
+        MUST treat ``{type:name}`` as ``{name}``. Samples read from a file
+        reach the engine as written, so the prefix has to be stripped here."""
+        samples_file = tmp_path / "alarm.intent"
+        samples_file.write_text("set an alarm in {number:offset} minutes\n")
+        pipeline.bus.emit(Message("padatious:register_intent", data={
+            "name": "demo:alarm_offset",
+            "file_name": str(samples_file),
+            "lang": "en-US",
+        }))
+        pipeline.bus.emit(Message("padatious:register_intent", data={
+            "name": "demo:other",
+            "samples": ["what time is it", "tell me the time"],
+            "lang": "en-US",
+        }))
+        pipeline.bus.emit(Message("mycroft.ready"))
+        container = pipeline.containers[pipeline.lang]
+        positives = container.clf.clfs["demo:alarm_offset"].positives
+        assert "set an alarm in {offset} minutes" in positives
+        assert not any("{number:offset}" in s for s in positives)
+        utt = "set an alarm in 5 minutes"
+        match = pipeline.calc_intent([utt], "en-US", Message(
+            "recognizer_loop:utterance", {"utterances": [utt], "lang": "en-US"}))
+        assert match is not None and match.name == "demo:alarm_offset"
+        matches = match.matches or {}
+        if isinstance(matches, dict):
+            matches = [matches]
+        slots = {k: v for m in matches for k, v in m.items()}
+        assert slots.get("offset") == "5"
+
     def test_register_entity_populates_kw_matcher(self, pipeline):
         # Register an intent first (so a k_matcher exists for the targeted intent)
         pipeline.bus.emit(Message("padatious:register_intent", data={

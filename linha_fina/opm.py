@@ -10,6 +10,7 @@ from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
 from ovos_plugin_manager.templates.pipeline import ConfidenceMatcherPipeline, IntentHandlerMatch
 from ovos_spec_tools import SpecMessage, closest_lang, standardize_lang
+from ovos_spec_tools.expansion import strip_type_prefixes
 from ovos_utils import flatten_list
 from ovos_utils.fakebus import FakeBus
 from ovos_utils.log import LOG
@@ -106,7 +107,14 @@ class LinhaFinaPipeline(ConfidenceMatcherPipeline):
         return IntentEngine()
 
     def _add_intent(self, lang: str, name: str, samples: List[str]) -> None:
-        """Register an intent into the engine for *lang*."""
+        """Register an intent into the engine for *lang*.
+
+        OVOS-INTENT-1 3.4: this engine does not implement typed slots, so a
+        ``{type:name}`` placeholder is loaded as ``{name}``. A producer strips
+        the prefix before it registers inline samples; samples read from a
+        file arrive as written, so the fold is applied here for both.
+        """
+        samples = [strip_type_prefixes(s) for s in samples]
         self.containers[lang].register_intent(name, samples)
 
     def _add_entity(self, lang: str, name: str, samples: List[str]) -> None:
