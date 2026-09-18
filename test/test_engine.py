@@ -129,12 +129,9 @@ class TestSlotExtraction:
     def test_template_match_extracts_slot(self, slot_engine):
         m = slot_engine.calc_intent("play africa")
         assert m.name == "play"
-        # slots may be a dict or a list-of-dicts depending on which layer fired
-        slots = m.slots
-        if isinstance(slots, list):
-            assert slots and slots[0].get("song") == "africa"
-        else:
-            assert slots.get("song") == "africa"
+        # one {str: str} map whichever layer fired (PIPELINE-1 §4.3, T-3165)
+        assert isinstance(m.slots, dict)
+        assert m.slots.get("song") == "africa"
 
     def test_template_with_alternative_phrasing(self, slot_engine):
         m = slot_engine.calc_intent("put on africa")
@@ -143,7 +140,7 @@ class TestSlotExtraction:
     def test_intent_without_slots_returns_empty(self, engine):
         m = engine.calc_intent("hello")
         # No keyword/template matcher → slots empty
-        assert m.slots == {} or m.slots == []
+        assert m.slots == {}
 
     def test_keyword_fallback_when_template_misses(self):
         e = IntentEngine()
