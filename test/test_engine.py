@@ -155,12 +155,8 @@ class TestSlotExtraction:
         # Utterance has the keyword but doesn't match the template pattern strictly
         m = e.calc_intent("africa please")
         if m.name == "play":
-            slots = m.slots
-            if isinstance(slots, list):
-                # Template path
-                pass
-            else:
-                assert slots.get("song") == "africa"
+            assert isinstance(m.slots, dict)
+            assert m.slots.get("song") == "africa"
 
 
 class TestLazyVsEagerTraining:

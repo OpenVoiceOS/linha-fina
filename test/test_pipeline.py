@@ -143,11 +143,8 @@ class TestRegistrationViaBus:
         match = pipeline.calc_intent([utt], "en-US", Message(
             "recognizer_loop:utterance", {"utterances": [utt], "lang": "en-US"}))
         assert match is not None and match.name == "demo:alarm_offset"
-        matches = match.matches or {}
-        if isinstance(matches, dict):
-            matches = [matches]
-        slots = {k: v for m in matches for k, v in m.items()}
-        assert slots.get("offset") == "5"
+        assert isinstance(match.matches, dict)
+        assert match.matches.get("offset") == "5"
 
     def test_register_entity_populates_kw_matcher(self, pipeline):
         # Register an intent first (so a k_matcher exists for the targeted intent)
