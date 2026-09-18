@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.4a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.4a1) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.3a1...0.4.4a1)
+
+**Merged pull requests:**
+
+- fix: a template match yields one slot map, not the list of every candidate [\#34](https://github.com/OpenVoiceOS/linha-fina/pull/34) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.4.3a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.3a1) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.2a1...0.4.3a1)
