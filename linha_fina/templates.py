@@ -43,7 +43,8 @@ class TemplateMatcher:
             query (str): The input query.
 
         Returns:
-            Slots: A dictionary with matched slots and confidence score.
+            List[Dict[str, str]]: one slot dict per template that matched,
+            best (highest token-set ratio) first. Empty when none matched.
         """
         matches = []
         for ent, templates in self.templates.items():

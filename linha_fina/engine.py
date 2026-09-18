@@ -93,7 +93,11 @@ class IntentEngine:
                     # print("benefit", label)
                     preds[label] = min(1.0, preds[label] * 1.1)
 
-                ents = self.t_matchers[label].match(query) or ents
+                # match() returns every candidate slot dict, best first;
+                # IntentMatch.slots is the one {str: str} map PIPELINE-1
+                # §4.3 dispatches, so take the best candidate (T-3165)
+                candidates = self.t_matchers[label].match(query)
+                ents = candidates[0] if candidates else ents
                 # penalize if the template has keywords, but no keywords extracted
                 if not ents:
                     # print("penalize", label)
