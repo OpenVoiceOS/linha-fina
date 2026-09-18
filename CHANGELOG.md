@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.4a2](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.4a2) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.4a1...0.4.4a2)
+
+**Merged pull requests:**
+
+- test: assert the dict slot map in the two tests that tolerated a list [\#36](https://github.com/OpenVoiceOS/linha-fina/pull/36) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [0.4.4a1](https://github.com/OpenVoiceOS/linha-fina/tree/0.4.4a1) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/linha-fina/compare/0.4.3a1...0.4.4a1)
